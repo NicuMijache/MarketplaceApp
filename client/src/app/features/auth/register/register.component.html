@@ -1,0 +1,60 @@
+<div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
+  <div class="w-full max-w-md">
+    <div class="card p-8">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Creează cont</h1>
+      <p class="text-gray-500 mb-6">Alătură-te comunității noastre</p>
+
+      @if (errorMessage) {
+        <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-4 text-sm">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Username *</label>
+          <input type="text" formControlName="username" class="input-field" placeholder="username123">
+          @if (form.get('username')?.invalid && form.get('username')?.touched) {
+            <p class="text-red-500 text-xs mt-1">Username: 3-30 caractere</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+          <input type="email" formControlName="email" class="input-field" placeholder="email@exemplu.ro">
+          @if (form.get('email')?.invalid && form.get('email')?.touched) {
+            <p class="text-red-500 text-xs mt-1">Email invalid</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Parolă *</label>
+          <input type="password" formControlName="password" class="input-field" placeholder="••••••••">
+          @if (form.get('password')?.invalid && form.get('password')?.touched) {
+            <p class="text-red-500 text-xs mt-1">Minim 8 caractere, cu majusculă, cifră și simbol special</p>
+          }
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+            <input type="tel" formControlName="phoneNumber" class="input-field" placeholder="07xx xxx xxx">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Oraș</label>
+            <input type="text" formControlName="city" class="input-field" placeholder="Cluj-Napoca">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary w-full mt-2" [disabled]="loading || form.invalid">
+          @if (loading) { Se creează contul... } @else { Creează cont }
+        </button>
+      </form>
+
+      <p class="text-center text-gray-500 text-sm mt-6">
+        Ai deja cont?
+        <a routerLink="/login" class="text-primary-600 hover:underline font-medium">Autentifică-te</a>
+      </p>
+    </div>
+  </div>
+</div>

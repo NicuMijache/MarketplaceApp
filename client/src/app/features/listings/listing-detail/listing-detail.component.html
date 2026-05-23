@@ -1,0 +1,180 @@
+<div class="max-w-6xl mx-auto px-4 py-8">
+
+  @if (loading) {
+    <div class="animate-pulse grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2 space-y-4">
+        <div class="bg-gray-200 h-96 rounded-xl"></div>
+        <div class="h-8 bg-gray-200 rounded w-3/4"></div>
+        <div class="h-4 bg-gray-200 rounded w-full"></div>
+      </div>
+    </div>
+  }
+
+  @if (!loading && listing) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- Left: Images + Details -->
+      <div class="lg:col-span-2 space-y-6">
+
+        <!-- Main image -->
+        <div class="card overflow-hidden">
+          <div class="relative h-96 bg-gray-100">
+            @if (listing.images[selectedImageIndex]?.imageUrl || listing.mainImageUrl) {
+              <img [src]="listing.images[selectedImageIndex]?.imageUrl || listing.mainImageUrl"
+                   [alt]="listing.title" class="w-full h-full object-contain">
+            } @else {
+              <div class="w-full h-full flex items-center justify-center text-gray-300">
+                <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586..."/>
+                </svg>
+              </div>
+            }
+          </div>
+
+          <!-- Thumbnails -->
+          @if (listing.images.length > 1) {
+            <div class="flex gap-2 p-3 overflow-x-auto">
+              @for (img of listing.images; track img.id; let i = $index) {
+                <button (click)="selectedImageIndex = i"
+                        [class]="i === selectedImageIndex ? 'ring-2 ring-primary-500 rounded-lg' : 'opacity-60 hover:opacity-100'"
+                        class="shrink-0">
+                  <img [src]="img.imageUrl" class="w-16 h-16 object-cover rounded-lg">
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Listing info -->
+        <div class="card p-6 space-y-4">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-sm text-primary-600 font-medium bg-primary-50 px-2 py-0.5 rounded-full">
+                {{ listing.categoryName }}
+              </span>
+              <h1 class="text-2xl font-bold text-gray-900 mt-2">{{ listing.title }}</h1>
+            </div>
+            <!-- Favorite button (only for logged-in non-owners) -->
+            @if (accountService.isLoggedIn() && !isOwner) {
+              <button (click)="toggleFavorite()" [disabled]="favoriteLoading"
+                      class="p-2 rounded-full hover:bg-red-50 transition-colors">
+                @if (isFavorited) {
+                  <svg class="w-7 h-7 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                } @else {
+                  <svg class="w-7 h-7 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/>
+                  </svg>
+                }
+              </button>
+            }
+          </div>
+
+          <div class="flex items-baseline gap-3">
+            <span class="text-3xl font-bold text-primary-600">{{ listing.price | number:'1.0-0' }} RON</span>
+            @if (listing.isNegotiable) {
+              <span class="text-gray-500 text-sm bg-gray-100 px-2 py-0.5 rounded-full">negociabil</span>
+            }
+          </div>
+
+          <div class="flex gap-4 text-sm text-gray-500">
+            <span>📍 {{ listing.city }}</span>
+            <span>📅 {{ listing.createdAt | date:'dd MMMM yyyy' }}</span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-medium"
+                  [class]="listing.status === 'Active' ? 'bg-green-100 text-green-700' :
+                            listing.status === 'Sold' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'">
+              {{ listing.status === 'Active' ? 'Activ' : listing.status === 'Sold' ? 'Vândut' : 'Pauză' }}
+            </span>
+          </div>
+
+          <div class="border-t pt-4">
+            <h3 class="font-semibold text-gray-800 mb-2">Descriere</h3>
+            <p class="text-gray-600 whitespace-pre-line leading-relaxed">{{ listing.description }}</p>
+          </div>
+
+          @if (isOwner) {
+            <div class="border-t pt-4 flex gap-3">
+              <a [routerLink]="['/listings', listing.id, 'edit']" class="btn-secondary text-sm">✏️ Editează</a>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Right: Seller card + Contact form -->
+      <div class="space-y-4">
+
+        <!-- Seller info -->
+        <div class="card p-5">
+          <h3 class="font-semibold text-gray-800 mb-3">Vânzător</h3>
+          <div class="flex items-center gap-3">
+            @if (listing.seller.profilePicture) {
+              <img [src]="listing.seller.profilePicture" class="w-12 h-12 rounded-full object-cover">
+            } @else {
+              <div class="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-lg">
+                {{ listing.seller.username.charAt(0).toUpperCase() }}
+              </div>
+            }
+            <div>
+              <p class="font-semibold text-gray-900">{{ listing.seller.username }}</p>
+              @if (listing.seller.city) {
+                <p class="text-sm text-gray-500">📍 {{ listing.seller.city }}</p>
+              }
+            </div>
+          </div>
+          @if (listing.seller.phoneNumber) {
+            <div class="mt-3 pt-3 border-t">
+              <a [href]="'tel:' + listing.seller.phoneNumber"
+                 class="flex items-center gap-2 text-primary-600 font-medium text-sm">
+                📞 {{ listing.seller.phoneNumber }}
+              </a>
+            </div>
+          }
+        </div>
+
+        <!-- Contact form -->
+        @if (!isOwner && listing.status === 'Active') {
+          <div class="card p-5">
+            <h3 class="font-semibold text-gray-800 mb-4">Contactează vânzătorul</h3>
+
+            @if (contactSuccess) {
+              <div class="bg-green-50 border border-green-200 text-green-700 rounded-lg p-4 text-sm">
+                ✅ Mesajul a fost trimis! Vânzătorul va fi notificat pe email.
+              </div>
+            } @else {
+              @if (contactError) {
+                <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm mb-3">
+                  {{ contactError }}
+                </div>
+              }
+
+              <form [formGroup]="contactForm" (ngSubmit)="sendContactRequest()" class="space-y-3">
+                <div>
+                  <input formControlName="senderName" class="input-field text-sm" placeholder="Numele tău *">
+                </div>
+                <div>
+                  <input formControlName="senderEmail" type="email" class="input-field text-sm" placeholder="Email *">
+                </div>
+                <div>
+                  <input formControlName="senderPhone" type="tel" class="input-field text-sm" placeholder="Telefon (opțional)">
+                </div>
+                <div>
+                  <textarea formControlName="message" rows="4" class="input-field text-sm resize-none"
+                            placeholder="Mesajul tău... (min 10 caractere)"></textarea>
+                  <p class="text-xs text-gray-400 mt-1">
+                    {{ contactForm.get('message')?.value?.length || 0 }}/1000
+                  </p>
+                </div>
+                <button type="submit" class="btn-primary w-full text-sm"
+                        [disabled]="contactForm.invalid || contactLoading">
+                  @if (contactLoading) { Se trimite... } @else { Trimite mesaj }
+                </button>
+              </form>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

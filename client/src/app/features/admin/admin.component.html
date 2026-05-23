@@ -1,0 +1,101 @@
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold text-gray-900 mb-6">🛡️ Admin Panel</h1>
+
+  <div class="flex gap-1 bg-gray-100 p-1 rounded-xl mb-6 w-fit">
+    <button (click)="switchTab('listings')"
+            [class]="activeTab === 'listings' ? 'bg-white shadow-sm font-semibold text-gray-900' : 'text-gray-500'"
+            class="px-4 py-2 rounded-lg text-sm transition-all">
+      📋 Anunțuri ({{ listings.length }})
+    </button>
+    <button (click)="switchTab('users')"
+            [class]="activeTab === 'users' ? 'bg-white shadow-sm font-semibold text-gray-900' : 'text-gray-500'"
+            class="px-4 py-2 rounded-lg text-sm transition-all">
+      👥 Utilizatori ({{ users.length }})
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="text-center py-12 text-gray-400">Se încarcă...</div>
+  }
+
+  <!-- Listings tab -->
+  @if (!loading && activeTab === 'listings') {
+    <div class="card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="text-left px-4 py-3 font-medium text-gray-600">Anunț</th>
+            <th class="text-left px-4 py-3 font-medium text-gray-600">Vânzător</th>
+            <th class="text-left px-4 py-3 font-medium text-gray-600">Preț</th>
+            <th class="text-left px-4 py-3 font-medium text-gray-600">Status</th>
+            <th class="text-left px-4 py-3 font-medium text-gray-600">Acțiuni</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (listing of listings; track listing.id) {
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3">
+                <a [routerLink]="['/listings', listing.id]" class="font-medium text-gray-900 hover:text-primary-600">
+                  {{ listing.title }}
+                </a>
+                <p class="text-gray-400 text-xs">{{ listing.city }} · {{ listing.categoryName }}</p>
+              </td>
+              <td class="px-4 py-3 text-gray-600">{{ listing.seller?.username }}</td>
+              <td class="px-4 py-3 font-semibold text-gray-900">{{ listing.price | number:'1.0-0' }} RON</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded-full text-xs font-medium"
+                      [class]="listing.status === 'Active' ? 'bg-green-100 text-green-700' :
+                                listing.status === 'Sold' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'">
+                  {{ listing.status }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex gap-1">
+                  @if (listing.status !== 'Active') {
+                    <button (click)="updateListingStatus(listing.id, 'Active')"
+                            class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200">Activează</button>
+                  }
+                  @if (listing.status !== 'Paused') {
+                    <button (click)="updateListingStatus(listing.id, 'Paused')"
+                            class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200">Pauză</button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Users tab -->
+  @if (!loading && activeTab === 'users') {
+    <div class="card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="text-left px-4 py-3 font-medium text-gray-600">Utilizator</th>
+            <th class="text-left px-4 py-3 font-medium text-gray-600">Email</th>
+            <th class="text-left px-4 py-3 font-medium text-gray-600">Oraș</th>
+            <th class="text-left px-4 py-3 font-medium text-gray-600">Acțiuni</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (user of users; track user.id) {
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 font-medium text-gray-900">{{ user.username }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ user.email }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ user.city || '–' }}</td>
+              <td class="px-4 py-3">
+                <button (click)="banUser(user.id)"
+                        class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">
+                  Blochează
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

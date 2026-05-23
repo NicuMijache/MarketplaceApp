@@ -1,0 +1,47 @@
+<div class="min-h-screen flex items-center justify-center px-4 bg-gray-50">
+  <div class="w-full max-w-md">
+    <div class="card p-8">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Bun venit înapoi!</h1>
+      <p class="text-gray-500 mb-6">Autentifică-te în contul tău</p>
+
+      @if (errorMessage) {
+        <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-4 text-sm">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" formControlName="email" class="input-field"
+                 placeholder="email@exemplu.ro">
+          @if (form.get('email')?.invalid && form.get('email')?.touched) {
+            <p class="text-red-500 text-xs mt-1">Email invalid</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Parolă</label>
+          <input type="password" formControlName="password" class="input-field"
+                 placeholder="••••••••">
+          @if (form.get('password')?.invalid && form.get('password')?.touched) {
+            <p class="text-red-500 text-xs mt-1">Parola trebuie să aibă minim 8 caractere</p>
+          }
+        </div>
+
+        <button type="submit" class="btn-primary w-full" [disabled]="loading">
+          @if (loading) {
+            <span>Se autentifică...</span>
+          } @else {
+            <span>Autentifică-te</span>
+          }
+        </button>
+      </form>
+
+      <p class="text-center text-gray-500 text-sm mt-6">
+        Nu ai cont?
+        <a routerLink="/register" class="text-primary-600 hover:underline font-medium">Înregistrează-te</a>
+      </p>
+    </div>
+  </div>
+</div>
