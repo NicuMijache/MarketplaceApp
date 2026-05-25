@@ -26,6 +26,7 @@ export class ProfileComponent implements OnInit {
   activeTab: 'listings' | 'messages' | 'settings' = 'listings';
   loading = false;
   updateSuccess = false;
+  photoLoading = false;
 
   form: FormGroup = this.fb.group({
     phoneNumber: [''],
@@ -62,6 +63,19 @@ export class ProfileComponent implements OnInit {
         setTimeout(() => this.updateSuccess = false, 3000);
       },
       error: () => this.loading = false
+    });
+  }
+
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.[0]) return;
+    this.photoLoading = true;
+    this.accountService.uploadPhoto(input.files[0]).subscribe({
+      next: ({ photoUrl }) => {
+        this.accountService.updateCurrentUserPhoto(photoUrl);
+        this.photoLoading = false;
+      },
+      error: () => this.photoLoading = false
     });
   }
 

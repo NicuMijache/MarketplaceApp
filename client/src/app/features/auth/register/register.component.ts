@@ -27,6 +27,22 @@ export class RegisterComponent {
 
   loading = false;
   errorMessage = '';
+  selectedPhoto: File | null = null;
+  photoPreview: string | null = null;
+
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.[0]) return;
+    this.selectedPhoto = input.files[0];
+    const reader = new FileReader();
+    reader.onload = e => this.photoPreview = e.target!.result as string;
+    reader.readAsDataURL(this.selectedPhoto);
+  }
+
+  removePhoto(): void {
+    this.selectedPhoto = null;
+    this.photoPreview = null;
+  }
 
   onSubmit(): void {
     if (this.form.invalid) return;
@@ -34,7 +50,20 @@ export class RegisterComponent {
     this.errorMessage = '';
 
     this.accountService.register(this.form.value).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: () => {
+        // After register, upload photo if selected
+        if (this.selectedPhoto) {
+          this.accountService.uploadPhoto(this.selectedPhoto).subscribe({
+            next: ({ photoUrl }) => {
+              this.accountService.updateCurrentUserPhoto(photoUrl);
+              this.router.navigate(['/']);
+            },
+            error: () => this.router.navigate(['/'])  // photo failed but account created
+          });
+        } else {
+          this.router.navigate(['/']);
+        }
+      },
       error: err => {
         this.errorMessage = Array.isArray(err.error)
           ? err.error.join(', ')

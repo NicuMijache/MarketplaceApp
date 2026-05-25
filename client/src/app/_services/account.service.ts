@@ -71,6 +71,16 @@ export class AccountService {
     return this.http.post<{ photoUrl: string }>(`${this.baseUrl}/me/photo`, formData);
   }
 
+  /** Updates profile picture in signal + localStorage after successful upload */
+  updateCurrentUserPhoto(photoUrl: string): void {
+    const user = this.currentUser();
+    if (user) {
+      const updated = { ...user, profilePicture: photoUrl };
+      localStorage.setItem('user', JSON.stringify(updated));
+      this.currentUser.set(updated);
+    }
+  }
+
   /** Called at app startup to restore session from localStorage */
   loadCurrentUser(): void {
     const userJson = localStorage.getItem('user');
