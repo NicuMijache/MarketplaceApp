@@ -1,82 +1,134 @@
-<div class="max-w-7xl mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Toate anunțurile</h1>
-    @if (result) {
-      <span class="text-gray-500 text-sm">{{ result.totalCount }} anunțuri găsite</span>
-    }
+  <!-- Search bar -->
+  <div class="mb-6">
+    <div class="flex gap-2">
+      <div class="relative flex-1">
+        <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
+          <app-icon name="search" [size]="18"></app-icon>
+        </div>
+        <input [(ngModel)]="filters.search" (keyup.enter)="onSearch()"
+               type="text" placeholder="Ce cauți astăzi?"
+               class="w-full pl-12 pr-10 py-3.5 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors text-sm">
+        @if (filters.search) {
+          <button (click)="filters.search=''; onSearch()"
+                  class="absolute inset-y-0 right-3 flex items-center px-1 text-gray-400 hover:text-gray-600">
+            <app-icon name="x" [size]="15"></app-icon>
+          </button>
+        }
+      </div>
+      <!-- Mobile filter toggle -->
+      <button (click)="showFilters = !showFilters"
+              class="md:hidden flex items-center gap-2 px-4 rounded-xl text-sm font-medium border transition-colors"
+              [class.bg-green-50]="showFilters || hasFilters"
+              [class.border-green-300]="showFilters || hasFilters"
+              [class.text-green-700]="showFilters || hasFilters"
+              [class.bg-white]="!showFilters && !hasFilters"
+              [class.border-gray-200]="!showFilters && !hasFilters"
+              [class.text-gray-700]="!showFilters && !hasFilters">
+        <app-icon name="filter" [size]="16"></app-icon>
+        {{ hasFilters ? 'Filtrat' : 'Filtre' }}
+      </button>
+    </div>
   </div>
 
   <div class="flex gap-6">
 
     <!-- Sidebar filters -->
-    <aside class="hidden lg:block w-64 shrink-0">
-      <div class="card p-5 space-y-5 sticky top-20">
-        <h2 class="font-semibold text-gray-800">Filtrează</h2>
+    <aside [class.hidden]="!showFilters" class="md:block w-full md:w-60 shrink-0">
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 sticky top-20">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="font-semibold text-gray-900 text-sm">Filtre</h2>
+          @if (hasFilters) {
+            <button (click)="clearFilters()" class="text-xs text-green-600 hover:text-green-700 font-semibold">
+              Resetează
+            </button>
+          }
+        </div>
 
-        <div>
-          <label class="text-sm font-medium text-gray-600 block mb-1">Categorie</label>
-          <select [(ngModel)]="filters.categoryId" class="input-field text-sm">
-            <option value="">Toate categoriile</option>
+        <!-- Categorie -->
+        <div class="mb-6">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Categorie</p>
+          <div class="space-y-0.5">
+            <button (click)="filters.categoryId=undefined; onSearch()"
+                    class="w-full text-left px-2.5 py-2 rounded-lg text-sm transition-colors"
+                    [class.bg-green-50]="!filters.categoryId"
+                    [class.text-green-700]="!filters.categoryId"
+                    [class.font-semibold]="!filters.categoryId"
+                    [class.text-gray-700]="!!filters.categoryId"
+                    [class.hover:bg-gray-50]="!!filters.categoryId">
+              Toate
+            </button>
             @for (cat of categories; track cat.id) {
-              <option [value]="cat.id">{{ cat.name }}</option>
-              @for (child of cat.children; track child.id) {
-                <option [value]="child.id">&nbsp;&nbsp;{{ child.name }}</option>
-              }
+              <button (click)="filters.categoryId=cat.id; onSearch()"
+                      class="w-full text-left px-2.5 py-2 rounded-lg text-sm transition-colors flex items-center justify-between"
+                      [class.bg-green-50]="filters.categoryId===cat.id"
+                      [class.text-green-700]="filters.categoryId===cat.id"
+                      [class.font-semibold]="filters.categoryId===cat.id"
+                      [class.text-gray-700]="filters.categoryId!==cat.id"
+                      [class.hover:bg-gray-50]="filters.categoryId!==cat.id">
+                <span>{{ cat.name }}</span>
+              </button>
             }
-          </select>
-        </div>
-
-        <div>
-          <label class="text-sm font-medium text-gray-600 block mb-1">Oraș</label>
-          <input [(ngModel)]="filters.city" class="input-field text-sm" placeholder="ex: Cluj-Napoca">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="text-sm font-medium text-gray-600 block mb-1">Preț min</label>
-            <input [(ngModel)]="filters.minPrice" type="number" class="input-field text-sm" placeholder="0">
-          </div>
-          <div>
-            <label class="text-sm font-medium text-gray-600 block mb-1">Preț max</label>
-            <input [(ngModel)]="filters.maxPrice" type="number" class="input-field text-sm" placeholder="∞">
           </div>
         </div>
 
-        <div>
-          <label class="text-sm font-medium text-gray-600 block mb-1">Sortează după</label>
-          <select [(ngModel)]="filters.orderBy" class="input-field text-sm">
-            <option value="date_desc">Cele mai recente</option>
-            <option value="price_asc">Preț crescător</option>
-            <option value="price_desc">Preț descrescător</option>
-          </select>
+        <!-- Preț -->
+        <div class="mb-6">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Preț (RON)</p>
+          <div class="flex gap-2">
+            <input [(ngModel)]="filters.minPrice" type="number" placeholder="Min"
+                   class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+            <input [(ngModel)]="filters.maxPrice" type="number" placeholder="Max"
+                   class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
         </div>
 
-        <button (click)="onSearch()" class="btn-primary w-full text-sm">Aplică filtrele</button>
-        <button (click)="clearFilters()" class="btn-secondary w-full text-sm">Resetează</button>
+        <!-- Oraș -->
+        <div class="mb-6">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Oraș</p>
+          <input [(ngModel)]="filters.city" placeholder="ex: Cluj-Napoca"
+                 class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+        </div>
+
+        <button (click)="onSearch()"
+                class="w-full bg-green-600 text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-green-700 transition-colors">
+          Aplică filtrele
+        </button>
       </div>
     </aside>
 
-    <!-- Main content -->
-    <div class="flex-1">
+    <!-- Main listing grid -->
+    <main class="flex-1 min-w-0">
 
-      <!-- Search bar -->
-      <div class="flex gap-2 mb-6">
-        <input [(ngModel)]="filters.search" (keyup.enter)="onSearch()"
-               class="input-field" placeholder="Caută anunțuri...">
-        <button (click)="onSearch()" class="btn-primary px-6">Caută</button>
+      <!-- Results bar -->
+      <div class="flex items-center justify-between mb-4">
+        <p class="text-sm text-gray-600">
+          @if (result) {
+            <span class="font-semibold text-gray-900">{{ result.totalCount }}</span> anunțuri
+            @if (hasFilters || filters.search) {
+              <span class="ml-1 text-green-600 font-medium">(filtrate)</span>
+            }
+          }
+        </p>
+        <select [(ngModel)]="filters.orderBy" (change)="onSearch()"
+                class="text-sm px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-700">
+          <option value="date_desc">Cele mai noi</option>
+          <option value="price_asc">Preț crescător</option>
+          <option value="price_desc">Preț descrescător</option>
+        </select>
       </div>
 
-      <!-- Loading -->
+      <!-- Loading skeleton -->
       @if (loading) {
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           @for (i of [1,2,3,4,5,6]; track i) {
-            <div class="card animate-pulse">
-              <div class="bg-gray-200 h-48 w-full"></div>
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm animate-pulse">
+              <div class="bg-gray-200 aspect-[4/3]"></div>
               <div class="p-4 space-y-2">
                 <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                <div class="h-5 bg-gray-200 rounded w-1/2"></div>
+                <div class="h-3 bg-gray-200 rounded w-1/3"></div>
               </div>
             </div>
           }
@@ -85,59 +137,66 @@
 
       <!-- Error -->
       @if (error) {
-        <div class="text-center py-16 text-red-500">{{ error }}</div>
+        <div class="text-center py-16 text-red-500 bg-white rounded-2xl border border-gray-200">{{ error }}</div>
       }
 
       <!-- Listings grid -->
       @if (!loading && result) {
         @if (result.items.length === 0) {
-          <div class="text-center py-16 text-gray-400">
-            <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <p class="text-lg">Niciun anunț găsit</p>
-            <button (click)="clearFilters()" class="mt-4 text-primary-600 underline text-sm">Resetează filtrele</button>
+          <div class="text-center py-20 bg-white rounded-2xl border border-gray-200">
+            <div class="text-gray-200 mx-auto mb-4 flex justify-center">
+              <app-icon name="search" [size]="40"></app-icon>
+            </div>
+            <h3 class="text-base font-semibold text-gray-900 mb-1">Niciun rezultat</h3>
+            <p class="text-sm text-gray-500 mb-4">Încearcă alți termeni sau resetează filtrele.</p>
+            <button (click)="clearFilters()" class="text-sm text-green-600 font-semibold hover:text-green-700">
+              Resetează filtrele
+            </button>
           </div>
         } @else {
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             @for (listing of result.items; track listing.id) {
-              <a [routerLink]="['/listings', listing.id]" class="card hover:shadow-md transition-shadow group">
+              <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-px transition-all duration-200 group">
+
                 <!-- Image -->
-                <div class="relative h-48 bg-gray-100 overflow-hidden">
+                <a [routerLink]="['/listings', listing.id]"
+                   class="block aspect-[4/3] relative bg-gray-100 overflow-hidden">
                   @if (listing.mainImageUrl) {
                     <img [src]="listing.mainImageUrl" [alt]="listing.title"
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                   } @else {
-                    <div class="w-full h-full flex items-center justify-center text-gray-300">
-                      <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                      </svg>
+                    <div class="w-full h-full flex flex-col items-center justify-center gap-1.5 text-gray-300">
+                      <app-icon name="image" [size]="36"></app-icon>
+                      <span class="text-xs font-mono text-gray-400">{{ listing.categoryName }}</span>
                     </div>
                   }
-                  <span class="absolute top-2 left-2 bg-white text-xs font-medium px-2 py-0.5 rounded-full text-gray-600 shadow-sm">
+                  <!-- Category badge -->
+                  <span class="absolute top-2 left-2 bg-white text-xs font-medium px-2 py-0.5 rounded-md text-gray-600 shadow-sm">
                     {{ listing.categoryName }}
                   </span>
-                </div>
+                </a>
 
-                <!-- Info -->
-                <div class="p-4">
-                  <h3 class="font-semibold text-gray-900 truncate group-hover:text-primary-600 transition-colors">
+                <!-- Content -->
+                <a [routerLink]="['/listings', listing.id]" class="block p-4">
+                  <h3 class="text-sm font-semibold text-gray-900 mb-2 line-clamp-2 leading-snug group-hover:text-green-700 transition-colors">
                     {{ listing.title }}
                   </h3>
-                  <p class="text-xl font-bold text-primary-600 mt-1">
-                    {{ listing.price | number:'1.0-0' }} RON
+                  <p class="text-lg font-bold text-green-600 mb-3">
+                    {{ listing.price | number:'1.0-0' }}
+                    <span class="text-sm font-semibold text-green-500">RON</span>
                     @if (listing.isNegotiable) {
-                      <span class="text-sm text-gray-400 font-normal ml-1">(negociabil)</span>
+                      <span class="text-xs text-gray-400 font-normal ml-1">(neg.)</span>
                     }
                   </p>
-                  <div class="flex items-center justify-between mt-2 text-sm text-gray-400">
-                    <span>📍 {{ listing.city }}</span>
+                  <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span class="flex items-center gap-1">
+                      <app-icon name="map-pin" [size]="11"></app-icon>
+                      {{ listing.city }}
+                    </span>
                     <span>{{ listing.createdAt | date:'dd MMM' }}</span>
                   </div>
-                </div>
-              </a>
+                </a>
+              </div>
             }
           </div>
 
@@ -146,20 +205,32 @@
             <div class="flex justify-center gap-2 mt-8">
               <button (click)="onPageChange(filters.pageNumber! - 1)"
                       [disabled]="!result.hasPreviousPage"
-                      class="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40">←</button>
+                      class="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                ←
+              </button>
               @for (page of pages; track page) {
                 <button (click)="onPageChange(page)"
-                        [class]="page === filters.pageNumber ? 'btn-primary px-3 py-1.5 text-sm' : 'btn-secondary px-3 py-1.5 text-sm'">
+                        class="px-3 py-1.5 text-sm rounded-lg transition-colors"
+                        [class.bg-green-600]="page === filters.pageNumber"
+                        [class.text-white]="page === filters.pageNumber"
+                        [class.font-semibold]="page === filters.pageNumber"
+                        [class.border]="page !== filters.pageNumber"
+                        [class.border-gray-200]="page !== filters.pageNumber"
+                        [class.bg-white]="page !== filters.pageNumber"
+                        [class.text-gray-700]="page !== filters.pageNumber"
+                        [class.hover:bg-gray-50]="page !== filters.pageNumber">
                   {{ page }}
                 </button>
               }
               <button (click)="onPageChange(filters.pageNumber! + 1)"
                       [disabled]="!result.hasNextPage"
-                      class="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40">→</button>
+                      class="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                →
+              </button>
             </div>
           }
         }
       }
-    </div>
+    </main>
   </div>
 </div>

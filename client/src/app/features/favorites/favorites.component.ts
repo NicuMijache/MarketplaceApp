@@ -2,12 +2,13 @@ import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FavoritesService } from '../../_services/favorites.service';
+import { SvgIconComponent } from '../../shared/svg-icon.component';
 import { ListingCard } from '../../_models/listing.model';
 
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, SvgIconComponent],
   templateUrl: './favorites.component.html'
 })
 export class FavoritesComponent implements OnInit {

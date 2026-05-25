@@ -7,11 +7,12 @@ import { FavoritesService } from '../../../_services/favorites.service';
 import { ContactService } from '../../../_services/contact.service';
 import { AccountService } from '../../../_services/account.service';
 import { Listing } from '../../../_models/listing.model';
+import { SvgIconComponent } from '../../../shared/svg-icon.component';
 
 @Component({
   selector: 'app-listing-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, SvgIconComponent],
   templateUrl: './listing-detail.component.html'
 })
 export class ListingDetailComponent implements OnInit {

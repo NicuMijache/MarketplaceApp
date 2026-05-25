@@ -1,127 +1,195 @@
-<div class="max-w-5xl mx-auto px-4 py-8">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
 
   <!-- Profile header -->
-  <div class="card p-6 mb-6">
-    <div class="flex items-center gap-4">
-      <div class="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-2xl">
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
+    <div class="flex flex-col sm:flex-row items-start gap-5">
+      <div class="w-20 h-20 bg-green-600 text-white rounded-full flex items-center justify-center text-3xl font-bold shrink-0">
         {{ accountService.currentUser()?.username?.charAt(0)?.toUpperCase() }}
       </div>
-      <div>
+      <div class="flex-1 min-w-0">
         <h1 class="text-xl font-bold text-gray-900">{{ accountService.currentUser()?.username }}</h1>
-        <p class="text-gray-500 text-sm">{{ accountService.currentUser()?.email }}</p>
+        <p class="text-sm text-gray-500 mt-0.5">{{ accountService.currentUser()?.email }}</p>
         @if (accountService.currentUser()?.city) {
-          <p class="text-gray-400 text-sm">📍 {{ accountService.currentUser()?.city }}</p>
+          <p class="text-xs text-gray-400 mt-1">📍 {{ accountService.currentUser()?.city }}</p>
         }
+        <div class="flex gap-2 mt-4">
+          <a routerLink="/listings/create"
+             class="flex items-center gap-1.5 bg-green-600 text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-green-700 transition-colors">
+            <app-icon name="plus" [size]="12"></app-icon>
+            Anunț nou
+          </a>
+          <button (click)="switchTab('settings')"
+                  class="flex items-center gap-1.5 text-xs font-medium text-gray-700 border border-gray-300 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+            <app-icon name="settings" [size]="12"></app-icon>
+            Setări
+          </button>
+        </div>
+      </div>
+      <div class="flex gap-3 sm:flex-col sm:items-end">
+        <div class="text-center bg-gray-50 rounded-xl px-4 py-2.5 min-w-[72px]">
+          <p class="text-xl font-bold text-gray-900">{{ myListings.length }}</p>
+          <p class="text-xs text-gray-500 mt-0.5">Anunțuri</p>
+        </div>
+        <div class="text-center bg-gray-50 rounded-xl px-4 py-2.5 min-w-[72px]">
+          <p class="text-xl font-bold text-gray-900">{{ receivedMessages.length }}</p>
+          <p class="text-xs text-gray-500 mt-0.5">Mesaje</p>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Tabs -->
-  <div class="flex gap-1 bg-gray-100 p-1 rounded-xl mb-6 w-fit">
+  <div class="flex gap-1 bg-gray-100 p-1 rounded-2xl mb-6">
     <button (click)="switchTab('listings')"
-            [class]="activeTab === 'listings' ? 'bg-white shadow-sm font-semibold text-gray-900' : 'text-gray-500 hover:text-gray-700'"
-            class="px-4 py-2 rounded-lg text-sm transition-all">
-      📋 Anunțurile mele ({{ myListings.length }})
+            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all"
+            [class.bg-white]="activeTab==='listings'" [class.shadow-sm]="activeTab==='listings'"
+            [class.text-gray-900]="activeTab==='listings'" [class.text-gray-500]="activeTab!=='listings'">
+      Anunțurile mele
+      <span class="text-xs font-bold px-1.5 py-0.5 rounded-full"
+            [class.bg-green-100]="activeTab==='listings'" [class.text-green-700]="activeTab==='listings'"
+            [class.bg-gray-200]="activeTab!=='listings'" [class.text-gray-500]="activeTab!=='listings'">
+        {{ myListings.length }}
+      </span>
     </button>
     <button (click)="switchTab('messages')"
-            [class]="activeTab === 'messages' ? 'bg-white shadow-sm font-semibold text-gray-900' : 'text-gray-500 hover:text-gray-700'"
-            class="px-4 py-2 rounded-lg text-sm transition-all">
-      📬 Mesaje primite
+            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all"
+            [class.bg-white]="activeTab==='messages'" [class.shadow-sm]="activeTab==='messages'"
+            [class.text-gray-900]="activeTab==='messages'" [class.text-gray-500]="activeTab!=='messages'">
+      Mesaje
+      @if (receivedMessages.length > 0) {
+        <span class="text-xs font-bold px-1.5 py-0.5 rounded-full"
+              [class.bg-green-100]="activeTab==='messages'" [class.text-green-700]="activeTab==='messages'"
+              [class.bg-gray-200]="activeTab!=='messages'" [class.text-gray-500]="activeTab!=='messages'">
+          {{ receivedMessages.length }}
+        </span>
+      }
     </button>
     <button (click)="switchTab('settings')"
-            [class]="activeTab === 'settings' ? 'bg-white shadow-sm font-semibold text-gray-900' : 'text-gray-500 hover:text-gray-700'"
-            class="px-4 py-2 rounded-lg text-sm transition-all">
-      ⚙️ Setări
+            class="flex-1 flex items-center justify-center py-2.5 rounded-xl text-sm font-medium transition-all"
+            [class.bg-white]="activeTab==='settings'" [class.shadow-sm]="activeTab==='settings'"
+            [class.text-gray-900]="activeTab==='settings'" [class.text-gray-500]="activeTab!=='settings'">
+      Setări
     </button>
   </div>
 
-  <!-- My Listings -->
+  <!-- Tab: Anunțurile mele -->
   @if (activeTab === 'listings') {
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="font-semibold text-gray-800">Anunțurile mele</h2>
-      <a routerLink="/listings/create" class="btn-primary text-sm">+ Anunț nou</a>
-    </div>
-
-    @if (myListings.length === 0) {
-      <div class="text-center py-12 text-gray-400">
-        <p>Nu ai niciun anunț publicat.</p>
-        <a routerLink="/listings/create" class="text-primary-600 hover:underline mt-2 inline-block">Adaugă primul anunț →</a>
+    <div class="space-y-3">
+      <div class="flex items-center justify-between mb-1">
+        <p class="text-sm font-semibold text-gray-900">{{ myListings.length }} anunțuri publicate</p>
+        <a routerLink="/listings/create"
+           class="flex items-center gap-1.5 text-sm font-semibold text-green-600 hover:text-green-700 transition-colors">
+          <app-icon name="plus" [size]="14"></app-icon>
+          Adaugă
+        </a>
       </div>
-    }
-
-    <div class="space-y-3">
-      @for (listing of myListings; track listing.id) {
-        <div class="card p-4 flex items-center gap-4">
-          <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden shrink-0">
-            @if (listing.mainImageUrl) {
-              <img [src]="listing.mainImageUrl" class="w-full h-full object-cover">
-            }
-          </div>
-          <div class="flex-1 min-w-0">
-            <a [routerLink]="['/listings', listing.id]" class="font-semibold text-gray-900 hover:text-primary-600 truncate block">
-              {{ listing.title }}
-            </a>
-            <p class="text-primary-600 font-bold">{{ listing.price | number:'1.0-0' }} RON</p>
-          </div>
-          <span class="text-xs px-2 py-1 rounded-full shrink-0"
-                [class]="listing.status === 'Active' ? 'bg-green-100 text-green-700' :
-                          listing.status === 'Sold' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'">
-            {{ listing.status === 'Active' ? 'Activ' : listing.status === 'Sold' ? 'Vândut' : 'Pauză' }}
-          </span>
-          <div class="flex gap-2 shrink-0">
-            <a [routerLink]="['/listings', listing.id, 'edit']" class="btn-secondary text-xs py-1 px-3">✏️</a>
-            <button (click)="deleteListing(listing.id)" class="btn-danger text-xs py-1 px-3">🗑️</button>
-          </div>
-        </div>
-      }
-    </div>
-  }
-
-  <!-- Messages -->
-  @if (activeTab === 'messages') {
-    @if (receivedMessages.length === 0) {
-      <div class="text-center py-12 text-gray-400">Nu ai primit niciun mesaj încă.</div>
-    }
-    <div class="space-y-3">
-      @for (msg of receivedMessages; track msg.id) {
-        <div class="card p-5">
-          <div class="flex justify-between items-start mb-2">
-            <div>
-              <p class="font-semibold text-gray-900">{{ msg.senderName }}</p>
-              <p class="text-sm text-gray-500">{{ msg.senderEmail }}
-                @if (msg.senderPhone) { · {{ msg.senderPhone }} }
-              </p>
-            </div>
-            <span class="text-xs text-gray-400">{{ msg.sentAt | date:'dd MMM, HH:mm' }}</span>
-          </div>
-          <p class="text-xs text-primary-600 mb-2">📋 {{ msg.listingTitle }}</p>
-          <p class="text-gray-700 bg-gray-50 rounded-lg p-3 text-sm">{{ msg.message }}</p>
-          <a [href]="'mailto:' + msg.senderEmail" class="mt-2 inline-block text-sm text-primary-600 hover:underline">
-            Răspunde →
+      @if (myListings.length === 0) {
+        <div class="text-center py-14 bg-white rounded-2xl border border-gray-200">
+          <div class="text-gray-300 flex justify-center mb-3"><app-icon name="package" [size]="36"></app-icon></div>
+          <p class="font-semibold text-gray-800 mb-1">Niciun anunț publicat</p>
+          <p class="text-sm text-gray-500 mb-5">Publică primul tău anunț chiar acum.</p>
+          <a routerLink="/listings/create"
+             class="bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-green-700 transition-colors inline-block">
+            Publică anunț
           </a>
         </div>
       }
+      @for (listing of myListings; track listing.id) {
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex items-center gap-4">
+          <div class="w-16 h-16 rounded-xl shrink-0 bg-gray-100 overflow-hidden">
+            @if (listing.mainImageUrl) {
+              <img [src]="listing.mainImageUrl" class="w-full h-full object-cover">
+            } @else {
+              <div class="w-full h-full flex items-center justify-center text-gray-300">
+                <app-icon name="image" [size]="20"></app-icon>
+              </div>
+            }
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <a [routerLink]="['/listings', listing.id]"
+                 class="text-sm font-semibold text-gray-900 truncate hover:text-green-700 transition-colors">
+                {{ listing.title }}
+              </a>
+              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full shrink-0"
+                    [class.bg-green-100]="listing.status==='Active'" [class.text-green-700]="listing.status==='Active'"
+                    [class.bg-red-100]="listing.status==='Sold'" [class.text-red-600]="listing.status==='Sold'"
+                    [class.bg-yellow-100]="listing.status==='Paused'" [class.text-yellow-700]="listing.status==='Paused'">
+                {{ listing.status === 'Active' ? 'Activ' : listing.status === 'Sold' ? 'Vândut' : 'Pauză' }}
+              </span>
+            </div>
+            <p class="text-base font-bold text-green-600 mt-0.5">{{ listing.price | number:'1.0-0' }} RON</p>
+          </div>
+          <div class="flex gap-1 shrink-0">
+            <a [routerLink]="['/listings', listing.id, 'edit']"
+               class="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors">
+              <app-icon name="edit" [size]="15"></app-icon>
+            </a>
+            <button (click)="deleteListing(listing.id)"
+                    class="p-2 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors">
+              <app-icon name="trash" [size]="15"></app-icon>
+            </button>
+          </div>
+        </div>
+      }
     </div>
   }
 
-  <!-- Settings -->
-  @if (activeTab === 'settings') {
-    <div class="card p-6 max-w-md">
-      <h2 class="font-semibold text-gray-800 mb-4">Actualizează profilul</h2>
-      @if (updateSuccess) {
-        <div class="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 mb-4 text-sm">✅ Profil actualizat!</div>
+  <!-- Tab: Mesaje -->
+  @if (activeTab === 'messages') {
+    @if (receivedMessages.length === 0) {
+      <div class="text-center py-14 bg-white rounded-2xl border border-gray-200 text-gray-400">
+        Nu ai primit niciun mesaj încă.
+      </div>
+    }
+    <div class="space-y-3">
+      @for (msg of receivedMessages; track msg.id) {
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex items-start gap-3">
+          <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-600 text-sm shrink-0">
+            {{ msg.senderName?.charAt(0)?.toUpperCase() }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-0.5">
+              <p class="text-sm font-semibold text-gray-900">{{ msg.senderName }}</p>
+              <span class="text-xs text-gray-400">{{ msg.sentAt | date:'dd MMM, HH:mm' }}</span>
+            </div>
+            <p class="text-xs text-gray-400 mb-1">Re: {{ msg.listingTitle }}</p>
+            <p class="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{{ msg.message }}</p>
+            <a [href]="'mailto:' + msg.senderEmail"
+               class="mt-2 inline-block text-xs text-green-600 hover:text-green-700 font-semibold">
+              Răspunde →
+            </a>
+          </div>
+        </div>
       }
-      <form [formGroup]="form" (ngSubmit)="updateProfile()" class="space-y-4">
+    </div>
+  }
+
+  <!-- Tab: Setări -->
+  @if (activeTab === 'settings') {
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h2 class="font-semibold text-gray-900">Informații cont</h2>
+      </div>
+      @if (updateSuccess) {
+        <div class="mx-6 mt-4 bg-green-50 border border-green-200 text-green-700 rounded-xl p-3 text-sm">
+          ✅ Profil actualizat cu succes!
+        </div>
+      }
+      <form [formGroup]="form" (ngSubmit)="updateProfile()" class="p-6 space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
-          <input formControlName="phoneNumber" type="tel" class="input-field" placeholder="07xx xxx xxx">
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Telefon</label>
+          <input formControlName="phoneNumber" type="tel" placeholder="07xx xxx xxx"
+                 class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Oraș</label>
-          <input formControlName="city" class="input-field" placeholder="Cluj-Napoca">
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Oraș</label>
+          <input formControlName="city" placeholder="Cluj-Napoca"
+                 class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
         </div>
-        <button type="submit" class="btn-primary" [disabled]="loading">
-          @if (loading) { Se salvează... } @else { Salvează }
+        <button type="submit" [disabled]="loading"
+                class="w-full bg-green-600 text-white font-semibold py-3 rounded-xl hover:bg-green-700 transition-colors text-sm disabled:opacity-60">
+          @if (loading) { Se salvează... } @else { Salvează modificările }
         </button>
       </form>
     </div>

@@ -1,60 +1,142 @@
-<div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
+<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
   <div class="w-full max-w-md">
-    <div class="card p-8">
-      <h1 class="text-2xl font-bold text-gray-900 mb-2">Creează cont</h1>
-      <p class="text-gray-500 mb-6">Alătură-te comunității noastre</p>
 
-      @if (errorMessage) {
-        <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-4 text-sm">
-          {{ errorMessage }}
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-white">
+        <app-icon name="home" [size]="22" [strokeWidth]="2.5"></app-icon>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900">Marketplace</h1>
+      <p class="text-sm text-gray-500 mt-1">Cumpără și vinde simplu</p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+
+      <!-- Tabs -->
+      <div class="flex">
+        <a routerLink="/login"
+           class="flex-1 py-4 text-sm font-semibold text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition-colors">
+          Autentificare
+        </a>
+        <div class="flex-1 py-4 text-sm font-semibold text-center border-b-2 border-green-600 text-green-600">
+          Înregistrare
         </div>
-      }
+      </div>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-4">
+
+        @if (errorMessage) {
+          <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
+            {{ errorMessage }}
+          </div>
+        }
+
+        <!-- Username -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Username *</label>
-          <input type="text" formControlName="username" class="input-field" placeholder="username123">
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Nume utilizator <span class="text-red-400">*</span></label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+              <app-icon name="user" [size]="15"></app-icon>
+            </div>
+            <input type="text" formControlName="username"
+                   placeholder="username123"
+                   class="w-full pl-9 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                   [class.border-red-300]="form.get('username')?.invalid && form.get('username')?.touched"
+                   [class.border-gray-200]="!(form.get('username')?.invalid && form.get('username')?.touched)">
+          </div>
           @if (form.get('username')?.invalid && form.get('username')?.touched) {
-            <p class="text-red-500 text-xs mt-1">Username: 3-30 caractere</p>
+            <p class="text-xs text-red-500 mt-1">Username: 3-30 caractere</p>
           }
         </div>
 
+        <!-- Email -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-          <input type="email" formControlName="email" class="input-field" placeholder="email@exemplu.ro">
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email <span class="text-red-400">*</span></label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+              <app-icon name="at-sign" [size]="15"></app-icon>
+            </div>
+            <input type="email" formControlName="email"
+                   placeholder="email@exemplu.ro"
+                   class="w-full pl-9 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                   [class.border-red-300]="form.get('email')?.invalid && form.get('email')?.touched"
+                   [class.border-gray-200]="!(form.get('email')?.invalid && form.get('email')?.touched)">
+          </div>
           @if (form.get('email')?.invalid && form.get('email')?.touched) {
-            <p class="text-red-500 text-xs mt-1">Email invalid</p>
+            <p class="text-xs text-red-500 mt-1">Email invalid</p>
           }
         </div>
 
+        <!-- Parolă -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Parolă *</label>
-          <input type="password" formControlName="password" class="input-field" placeholder="••••••••">
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Parolă <span class="text-red-400">*</span></label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+              <app-icon name="lock" [size]="15"></app-icon>
+            </div>
+            <input type="password" formControlName="password"
+                   placeholder="Minim 8 caractere"
+                   class="w-full pl-9 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                   [class.border-red-300]="form.get('password')?.invalid && form.get('password')?.touched"
+                   [class.border-gray-200]="!(form.get('password')?.invalid && form.get('password')?.touched)">
+          </div>
           @if (form.get('password')?.invalid && form.get('password')?.touched) {
-            <p class="text-red-500 text-xs mt-1">Minim 8 caractere, cu majusculă, cifră și simbol special</p>
+            <p class="text-xs text-red-500 mt-1">Minim 8 caractere, cu majusculă, cifră și simbol special</p>
           }
         </div>
 
+        <!-- Telefon + Oraș -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
-            <input type="tel" formControlName="phoneNumber" class="input-field" placeholder="07xx xxx xxx">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Telefon</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+                <app-icon name="phone" [size]="14"></app-icon>
+              </div>
+              <input type="tel" formControlName="phoneNumber"
+                     placeholder="07xx xxx xxx"
+                     class="w-full pl-9 pr-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors">
+            </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Oraș</label>
-            <input type="text" formControlName="city" class="input-field" placeholder="Cluj-Napoca">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Oraș</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+                <app-icon name="map-pin" [size]="14"></app-icon>
+              </div>
+              <input type="text" formControlName="city"
+                     placeholder="Cluj-Napoca"
+                     class="w-full pl-9 pr-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors">
+            </div>
           </div>
         </div>
 
-        <button type="submit" class="btn-primary w-full mt-2" [disabled]="loading || form.invalid">
-          @if (loading) { Se creează contul... } @else { Creează cont }
+        <!-- Submit -->
+        <button type="submit" [disabled]="loading || form.invalid"
+                class="w-full bg-green-600 text-white font-semibold py-3 rounded-xl hover:bg-green-700 transition-colors disabled:opacity-60 flex items-center justify-center gap-2 text-sm mt-2">
+          @if (loading) {
+            <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            Se creează contul...
+          } @else {
+            Creează cont
+          }
         </button>
-      </form>
 
-      <p class="text-center text-gray-500 text-sm mt-6">
-        Ai deja cont?
-        <a routerLink="/login" class="text-primary-600 hover:underline font-medium">Autentifică-te</a>
-      </p>
+        <p class="text-center text-xs text-gray-500">
+          Ai deja cont?
+          <a routerLink="/login" class="text-green-600 font-semibold hover:text-green-700">Autentifică-te</a>
+        </p>
+        <p class="text-center text-xs text-gray-400">
+          Prin înregistrare ești de acord cu
+          <span class="text-green-600 cursor-pointer">Termenii de utilizare</span>
+        </p>
+      </form>
     </div>
+
+    <a routerLink="/"
+       class="w-full mt-5 text-sm text-gray-500 hover:text-gray-700 text-center transition-colors block">
+      ← Înapoi la anunțuri
+    </a>
   </div>
 </div>

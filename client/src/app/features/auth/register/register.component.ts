@@ -3,11 +3,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AccountService } from '../../../_services/account.service';
 import { CommonModule } from '@angular/common';
+import { SvgIconComponent } from '../../../shared/svg-icon.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink, SvgIconComponent],
   templateUrl: './register.component.html'
 })
 export class RegisterComponent {

@@ -5,11 +5,12 @@ import { RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { Listing } from '../../_models/listing.model';
 import { User } from '../../_models/user.model';
+import { SvgIconComponent } from '../../shared/svg-icon.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, SvgIconComponent],
   templateUrl: './admin.component.html'
 })
 export class AdminComponent implements OnInit {
@@ -20,6 +21,9 @@ export class AdminComponent implements OnInit {
   users: User[] = [];
   activeTab: 'listings' | 'users' = 'listings';
   loading = true;
+
+  get activeListings(): number { return this.listings.filter(l => l.status === 'Active').length; }
+  get soldListings(): number { return this.listings.filter(l => l.status === 'Sold').length; }
 
   ngOnInit(): void {
     this.loadListings();

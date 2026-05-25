@@ -5,11 +5,12 @@ import { CommonModule } from '@angular/common';
 import { ListingService } from '../../../_services/listing.service';
 import { CategoryService } from '../../../_services/category.service';
 import { Category } from '../../../_models/category.model';
+import { SvgIconComponent } from '../../../shared/svg-icon.component';
 
 @Component({
   selector: 'app-listing-create',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink, SvgIconComponent],
   templateUrl: './listing-create.component.html'
 })
 export class ListingCreateComponent implements OnInit {

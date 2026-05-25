@@ -7,11 +7,12 @@ import { CategoryService } from '../../../_services/category.service';
 import { ListingCard } from '../../../_models/listing.model';
 import { Category } from '../../../_models/category.model';
 import { PaginatedResult, ListingFilterParams } from '../../../_models/pagination.model';
+import { SvgIconComponent } from '../../../shared/svg-icon.component';
 
 @Component({
   selector: 'app-listing-list',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule],
+  imports: [RouterLink, FormsModule, CommonModule, SvgIconComponent],
   templateUrl: './listing-list.component.html'
 })
 export class ListingListComponent implements OnInit {
@@ -22,6 +23,11 @@ export class ListingListComponent implements OnInit {
   categories: Category[] = [];
   loading = true;
   error = '';
+  showFilters = false;
+
+  get hasFilters(): boolean {
+    return !!(this.filters.categoryId || this.filters.city || this.filters.minPrice || this.filters.maxPrice);
+  }
 
   // Filter state — bound to the search form
   filters: ListingFilterParams = {

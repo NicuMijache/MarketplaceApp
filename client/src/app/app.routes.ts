@@ -11,12 +11,6 @@ export const routes: Routes = [
         .then(m => m.ListingListComponent)
   },
   {
-    path: 'listings/:id',
-    loadComponent: () =>
-      import('./features/listings/listing-detail/listing-detail.component')
-        .then(m => m.ListingDetailComponent)
-  },
-  {
     path: 'login',
     loadComponent: () =>
       import('./features/auth/login/login.component')
@@ -29,13 +23,19 @@ export const routes: Routes = [
         .then(m => m.RegisterComponent)
   },
 
-  // Protected routes (require JWT) — listed BEFORE :id to avoid conflict
+  // ⚠️ Specific routes MUST come before :id wildcard routes
   {
     path: 'listings/create',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/listings/listing-create/listing-create.component')
         .then(m => m.ListingCreateComponent)
+  },
+  {
+    path: 'listings/:id',
+    loadComponent: () =>
+      import('./features/listings/listing-detail/listing-detail.component')
+        .then(m => m.ListingDetailComponent)
   },
   {
     path: 'listings/:id/edit',

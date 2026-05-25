@@ -7,11 +7,12 @@ import { ListingService } from '../../_services/listing.service';
 import { ContactService } from '../../_services/contact.service';
 import { Listing } from '../../_models/listing.model';
 import { ContactRequest } from '../../_models/contact.model';
+import { SvgIconComponent } from '../../shared/svg-icon.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, SvgIconComponent],
   templateUrl: './profile.component.html'
 })
 export class ProfileComponent implements OnInit {

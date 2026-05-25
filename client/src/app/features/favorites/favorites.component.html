@@ -1,49 +1,78 @@
-<div class="max-w-5xl mx-auto px-4 py-8">
-  <h1 class="text-2xl font-bold text-gray-900 mb-6">❤️ Anunțurile mele favorite</h1>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Anunțuri favorite</h1>
+      <p class="text-sm text-gray-500 mt-1">
+        {{ listings.length }} {{ listings.length === 1 ? 'anunț salvat' : 'anunțuri salvate' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading -->
   @if (loading) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       @for (i of [1,2,3]; track i) {
-        <div class="card animate-pulse">
-          <div class="bg-gray-200 h-40"></div>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm animate-pulse">
+          <div class="bg-gray-200 aspect-[4/3]"></div>
           <div class="p-4 space-y-2">
             <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div class="h-5 bg-gray-200 rounded w-1/2"></div>
           </div>
         </div>
       }
     </div>
   }
 
+  <!-- Empty state -->
   @if (!loading && listings.length === 0) {
-    <div class="text-center py-16 text-gray-400">
-      <p class="text-5xl mb-4">💔</p>
-      <p class="text-lg font-medium">Nu ai anunțuri favorite încă</p>
-      <a routerLink="/" class="mt-4 inline-block text-primary-600 hover:underline">Explorează anunțurile →</a>
+    <div class="text-center py-24 bg-white rounded-2xl border border-gray-200">
+      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
+        <app-icon name="heart" [size]="28"></app-icon>
+      </div>
+      <h3 class="text-base font-semibold text-gray-900 mb-1">Niciun anunț salvat</h3>
+      <p class="text-sm text-gray-500 mb-6">Apasă pe inimă pe orice anunț pentru a-l salva.</p>
+      <a routerLink="/"
+         class="bg-green-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-green-700 transition-colors inline-block">
+        Descoperă anunțuri
+      </a>
     </div>
   }
 
+  <!-- Grid -->
   @if (!loading && listings.length > 0) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       @for (listing of listings; track listing.id) {
-        <div class="card group">
-          <a [routerLink]="['/listings', listing.id]">
-            <div class="h-40 bg-gray-100 overflow-hidden">
-              @if (listing.mainImageUrl) {
-                <img [src]="listing.mainImageUrl" [alt]="listing.title"
-                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-              }
-            </div>
-            <div class="p-4">
-              <h3 class="font-semibold text-gray-900 truncate">{{ listing.title }}</h3>
-              <p class="text-lg font-bold text-primary-600 mt-1">{{ listing.price | number:'1.0-0' }} RON</p>
-              <p class="text-sm text-gray-400 mt-1">📍 {{ listing.city }}</p>
-            </div>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-px transition-all duration-200 group">
+
+          <a [routerLink]="['/listings', listing.id]"
+             class="block aspect-[4/3] bg-gray-100 overflow-hidden">
+            @if (listing.mainImageUrl) {
+              <img [src]="listing.mainImageUrl" [alt]="listing.title"
+                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            } @else {
+              <div class="w-full h-full flex items-center justify-center text-gray-300">
+                <app-icon name="image" [size]="32"></app-icon>
+              </div>
+            }
           </a>
+
+          <a [routerLink]="['/listings', listing.id]" class="block p-4">
+            <h3 class="font-semibold text-gray-900 truncate text-sm group-hover:text-green-700 transition-colors">
+              {{ listing.title }}
+            </h3>
+            <p class="text-lg font-bold text-green-600 mt-1">{{ listing.price | number:'1.0-0' }} RON</p>
+            <p class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+              <app-icon name="map-pin" [size]="11"></app-icon>
+              {{ listing.city }}
+            </p>
+          </a>
+
           <div class="px-4 pb-4">
             <button (click)="removeFavorite(listing.id)"
-                    class="text-sm text-red-500 hover:text-red-700 transition-colors">
-              ✕ Elimină din favorite
+                    class="w-full py-2 text-xs font-semibold text-red-500 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+              Elimină din favorite
             </button>
           </div>
         </div>

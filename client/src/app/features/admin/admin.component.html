@@ -1,16 +1,50 @@
-<div class="max-w-6xl mx-auto px-4 py-8">
-  <h1 class="text-2xl font-bold text-gray-900 mb-6">🛡️ Admin Panel</h1>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
-  <div class="flex gap-1 bg-gray-100 p-1 rounded-xl mb-6 w-fit">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Panou Administrare</h1>
+      <p class="text-sm text-gray-500 mt-0.5">Gestionează anunțurile și utilizatorii platformei</p>
+    </div>
+    <span class="flex items-center gap-2 bg-purple-100 text-purple-700 px-3 py-1.5 rounded-xl text-sm font-bold">
+      <app-icon name="shield" [size]="14"></app-icon>
+      Admin
+    </span>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 text-center">
+      <p class="text-2xl font-bold text-gray-900">{{ listings.length }}</p>
+      <p class="text-xs text-gray-500 mt-1">Total anunțuri</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 text-center">
+      <p class="text-2xl font-bold text-green-600">{{ activeListings }}</p>
+      <p class="text-xs text-gray-500 mt-1">Active</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 text-center">
+      <p class="text-2xl font-bold text-gray-900">{{ users.length }}</p>
+      <p class="text-xs text-gray-500 mt-1">Utilizatori</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 text-center">
+      <p class="text-2xl font-bold text-red-500">{{ soldListings }}</p>
+      <p class="text-xs text-gray-500 mt-1">Vândute</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex gap-1 bg-gray-100 p-1 rounded-xl mb-5 w-fit">
     <button (click)="switchTab('listings')"
-            [class]="activeTab === 'listings' ? 'bg-white shadow-sm font-semibold text-gray-900' : 'text-gray-500'"
-            class="px-4 py-2 rounded-lg text-sm transition-all">
-      📋 Anunțuri ({{ listings.length }})
+            class="px-5 py-2 rounded-lg text-sm font-semibold transition-all"
+            [class.bg-white]="activeTab==='listings'" [class.shadow-sm]="activeTab==='listings'"
+            [class.text-gray-900]="activeTab==='listings'" [class.text-gray-500]="activeTab!=='listings'">
+      Anunțuri ({{ listings.length }})
     </button>
     <button (click)="switchTab('users')"
-            [class]="activeTab === 'users' ? 'bg-white shadow-sm font-semibold text-gray-900' : 'text-gray-500'"
-            class="px-4 py-2 rounded-lg text-sm transition-all">
-      👥 Utilizatori ({{ users.length }})
+            class="px-5 py-2 rounded-lg text-sm font-semibold transition-all"
+            [class.bg-white]="activeTab==='users'" [class.shadow-sm]="activeTab==='users'"
+            [class.text-gray-900]="activeTab==='users'" [class.text-gray-500]="activeTab!=='users'">
+      Utilizatori ({{ users.length }})
     </button>
   </div>
 
@@ -20,82 +54,107 @@
 
   <!-- Listings tab -->
   @if (!loading && activeTab === 'listings') {
-    <div class="card overflow-hidden">
-      <table class="w-full text-sm">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th class="text-left px-4 py-3 font-medium text-gray-600">Anunț</th>
-            <th class="text-left px-4 py-3 font-medium text-gray-600">Vânzător</th>
-            <th class="text-left px-4 py-3 font-medium text-gray-600">Preț</th>
-            <th class="text-left px-4 py-3 font-medium text-gray-600">Status</th>
-            <th class="text-left px-4 py-3 font-medium text-gray-600">Acțiuni</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          @for (listing of listings; track listing.id) {
-            <tr class="hover:bg-gray-50">
-              <td class="px-4 py-3">
-                <a [routerLink]="['/listings', listing.id]" class="font-medium text-gray-900 hover:text-primary-600">
-                  {{ listing.title }}
-                </a>
-                <p class="text-gray-400 text-xs">{{ listing.city }} · {{ listing.categoryName }}</p>
-              </td>
-              <td class="px-4 py-3 text-gray-600">{{ listing.seller?.username }}</td>
-              <td class="px-4 py-3 font-semibold text-gray-900">{{ listing.price | number:'1.0-0' }} RON</td>
-              <td class="px-4 py-3">
-                <span class="px-2 py-0.5 rounded-full text-xs font-medium"
-                      [class]="listing.status === 'Active' ? 'bg-green-100 text-green-700' :
-                                listing.status === 'Sold' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'">
-                  {{ listing.status }}
-                </span>
-              </td>
-              <td class="px-4 py-3">
-                <div class="flex gap-1">
-                  @if (listing.status !== 'Active') {
-                    <button (click)="updateListingStatus(listing.id, 'Active')"
-                            class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200">Activează</button>
-                  }
-                  @if (listing.status !== 'Paused') {
-                    <button (click)="updateListingStatus(listing.id, 'Paused')"
-                            class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200">Pauză</button>
-                  }
-                </div>
-              </td>
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-200">
+              <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Anunț</th>
+              <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Vânzător</th>
+              <th class="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Preț</th>
+              <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Acțiuni</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @for (listing of listings; track listing.id; let i = $index) {
+              <tr class="hover:bg-gray-50 transition-colors" [class.bg-gray-50]="i % 2 !== 0">
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="min-w-0">
+                      <a [routerLink]="['/listings', listing.id]"
+                         class="font-semibold text-gray-900 hover:text-green-700 transition-colors truncate block max-w-[160px]">
+                        {{ listing.title }}
+                      </a>
+                      <p class="text-xs text-gray-400">{{ listing.city }} · {{ listing.categoryName }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-gray-600 hidden md:table-cell">{{ listing.seller?.username }}</td>
+                <td class="px-4 py-3 font-semibold text-gray-900 text-right hidden sm:table-cell">
+                  {{ listing.price | number:'1.0-0' }} RON
+                </td>
+                <td class="px-4 py-3 text-center">
+                  <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                        [class.bg-green-100]="listing.status==='Active'" [class.text-green-700]="listing.status==='Active'"
+                        [class.bg-red-100]="listing.status==='Sold'" [class.text-red-600]="listing.status==='Sold'"
+                        [class.bg-yellow-100]="listing.status==='Paused'" [class.text-yellow-700]="listing.status==='Paused'">
+                    {{ listing.status === 'Active' ? 'Activ' : listing.status === 'Sold' ? 'Vândut' : 'Pauză' }}
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center justify-end gap-1 flex-wrap">
+                    @if (listing.status !== 'Active') {
+                      <button (click)="updateListingStatus(listing.id, 'Active')"
+                              class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors">
+                        Activează
+                      </button>
+                    }
+                    @if (listing.status !== 'Paused') {
+                      <button (click)="updateListingStatus(listing.id, 'Paused')"
+                              class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition-colors">
+                        Pauză
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
   }
 
   <!-- Users tab -->
   @if (!loading && activeTab === 'users') {
-    <div class="card overflow-hidden">
-      <table class="w-full text-sm">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th class="text-left px-4 py-3 font-medium text-gray-600">Utilizator</th>
-            <th class="text-left px-4 py-3 font-medium text-gray-600">Email</th>
-            <th class="text-left px-4 py-3 font-medium text-gray-600">Oraș</th>
-            <th class="text-left px-4 py-3 font-medium text-gray-600">Acțiuni</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          @for (user of users; track user.id) {
-            <tr class="hover:bg-gray-50">
-              <td class="px-4 py-3 font-medium text-gray-900">{{ user.username }}</td>
-              <td class="px-4 py-3 text-gray-600">{{ user.email }}</td>
-              <td class="px-4 py-3 text-gray-500">{{ user.city || '–' }}</td>
-              <td class="px-4 py-3">
-                <button (click)="banUser(user.id)"
-                        class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">
-                  Blochează
-                </button>
-              </td>
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-200">
+              <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Utilizator</th>
+              <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Email</th>
+              <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Oraș</th>
+              <th class="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Acțiuni</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @for (user of users; track user.id; let i = $index) {
+              <tr class="hover:bg-gray-50 transition-colors" [class.bg-gray-50]="i % 2 !== 0">
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-sm shrink-0">
+                      {{ user.username?.charAt(0)?.toUpperCase() }}
+                    </div>
+                    <p class="font-semibold text-gray-900">{{ user.username }}</p>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-gray-600 hidden md:table-cell">{{ user.email }}</td>
+                <td class="px-4 py-3 text-gray-500 hidden lg:table-cell">{{ user.city || '–' }}</td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center justify-end">
+                    <button (click)="banUser(user.id)"
+                            class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors">
+                      Blochează
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
   }
 </div>
